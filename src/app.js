@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const { default: helmet } = require('helmet');
 const compression = require('compression');
+const { checkOverload } = require('./helper/check.connnect');
 
 const app = express();
 
@@ -11,7 +12,8 @@ app.use(helmet());
 app.use(compression());
 
 //init db
-
+require('./dbs/init.mongodb');
+checkOverload();
 //init router
 
 app.get('/', (req, res, next) => {

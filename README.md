@@ -21,3 +21,6 @@ Bài2: Kết nối mongodb (doc thêm tài liệu ở đây: https://mongoosejs.
 - Config check number of connection or over connection to db;
 - Có nên đống connect không: không nhất thiết phải đóng kết nối vì mongodb theo 1 nhóm kết nối.
 - PoolSize
+-----------------------------------------------------------------------------------
+Bài3: Add env file.
+

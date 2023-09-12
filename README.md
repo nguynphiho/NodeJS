@@ -23,4 +23,8 @@ Bài2: Kết nối mongodb (doc thêm tài liệu ở đây: https://mongoosejs.
 - PoolSize
 -----------------------------------------------------------------------------------
 Bài3: Add env file.
-
+----------------------------------------------------------
+Bài4: Viết SignUp api.
+- Đọc thêm tài liệu về mongoose nha
+- Install mongoose
+- tạo model shop

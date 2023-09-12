@@ -11,19 +11,16 @@ const app = express();
 app.use(morgan("combined"));
 app.use(helmet());
 app.use(compression());
+app.use(express.json())
+app.use(express.urlencoded({
+    extended: true,
+}))
 
 //init db
 require('./dbs/init.mongodb');
-// checkOverload();
-//init router
 
-app.get('/', (req, res, next) => {
-    const strCompress = "Xin chao!";
-    return res.status(200).json({
-        message: "Well come nodejs!",
-        metaData: strCompress.repeat(10000),
-    })
-})
+//init router
+app.use('/', require('./routers'));
 
 //handling error
 

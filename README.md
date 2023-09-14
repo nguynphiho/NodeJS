@@ -28,3 +28,6 @@ Bài4: Viết SignUp api.
 - Đọc thêm tài liệu về mongoose nha
 - Install mongoose
 - tạo model shop
+- viết service
+
+Bài5: create custom dynamic middleware for api key

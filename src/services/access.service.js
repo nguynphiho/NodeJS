@@ -43,7 +43,7 @@ class AccessService {
         })
         
         return {
-            shop: getInforData({ fields: ['_id', 'name', 'email'], object: newShop }),
+            shop: getInforData({ fields: ['_id', 'name', 'email'], object: foundShop }),
             tokens
         }  
 

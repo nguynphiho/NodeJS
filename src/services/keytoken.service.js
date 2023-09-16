@@ -14,7 +14,7 @@ class KeyTokenService {
             };
             const options = { upsert: true, new: true };
 
-            const tokens = await keytokenModel.findOneAndRemove(filter, update, options);
+            const tokens = await keytokenModel.findOneAndUpdate(filter, update, options);
             return tokens ? tokens.publicKey : null;
         } catch(error) {
             return error;

@@ -6,7 +6,8 @@ const shopModel = require("../models/shop.model");
 const { createTokenPair } = require('../auth/authUtils');
 const KeyTokenService = require('./keytoken.service');
 const { getInforData } = require('../utils');
-const { ConflictRequestError, BadRequestError } = require('../core/error.response');
+const { ConflictRequestError, BadRequestError, AuthFailureError } = require('../core/error.response');
+const { findByEmail } = require('./shop.service');
 
 const RoleShop = {
     SHOP: 'SHOP',
@@ -16,6 +17,38 @@ const RoleShop = {
 }
 
 class AccessService {
+    /**
+     * 1- check email trong dbs
+     * 2- match password
+     * 3- create AT and RT and save
+     * 4- generate token
+     * 5- get data return login
+     */
+    static login = async({ email, password, refreshToken = null }) => {
+        const foundShop = await findByEmail({ email });
+        if ( !foundShop ) throw new BadRequestError('Shop not registered');
+        
+        const match = bcrypt.compare(password, foundShop.password);
+        if (!match) throw new AuthFailureError('Authentication Error');
+
+        const { privateKey, publicKey } = this.keyGen();
+        
+        const tokens = await createTokenPair({ userId: foundShop._id, email}, publicKey, privateKey);
+
+        await KeyTokenService.createKeyToken({
+            userId: foundShop._id,
+            privateKey,
+            publicKey,
+            refreshToken: tokens.refreshToken
+        })
+        
+        return {
+            shop: getInforData({ fields: ['_id', 'name', 'email'], object: foundShop }),
+            tokens
+        }  
+
+    }
+
     static signUp = async ({ name, email, password }) => {
         const holdShop = await shopModel.findOne({ email }).lean();
         if (holdShop) {
@@ -29,17 +62,7 @@ class AccessService {
 
         if (newShop) {
             //create private key and public key using crypto libray
-            const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-                modulusLength: 4096,
-                publicKeyEncoding: {
-                    type: 'pkcs1',
-                    format: 'pem'
-                },
-                privateKeyEncoding: {
-                    type: 'pkcs1',
-                    format: 'pem'
-                }
-            })
+            const { privateKey, publicKey } = this.keyGen();
 
             /**
              * save a key into db
@@ -51,7 +74,7 @@ class AccessService {
                 publicKey,
                 privateKey
             });
-
+            
             if (!publicKeyString) {
                 throw new BadRequestError("Error: Key error!");
             }
@@ -63,13 +86,24 @@ class AccessService {
             const tokens = await createTokenPair({ userId: newShop._id, email}, publicKeyObject, privateKey);
 
             return {
-                code: 201,
-                metadata: {
-                    shop: getInforData({ fields: ['_id', 'name', 'email'], object: newShop }),
-                    tokens
-                } 
+                shop: getInforData({ fields: ['_id', 'name', 'email'], object: newShop }),
+                tokens
             }    
         }
+    }
+
+    static keyGen() {
+        return crypto.generateKeyPairSync('rsa', {
+            modulusLength: 4096,
+            publicKeyEncoding: {
+                type: 'pkcs1',
+                format: 'pem'
+            },
+            privateKeyEncoding: {
+                type: 'pkcs1',
+                format: 'pem'
+            }
+        })
     }
 }
 

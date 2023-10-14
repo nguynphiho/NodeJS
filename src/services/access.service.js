@@ -20,7 +20,7 @@ class AccessService {
     /**
      * 1- check email trong dbs
      * 2- match password
-     * 3- create AT vaf RT and save
+     * 3- create AT and RT and save
      * 4- generate token
      * 5- get data return login
      */

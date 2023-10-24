@@ -4,7 +4,7 @@
 
 POST {{url_dev}}shop/signup
 Content-Type: application/json
-x-api-key: f1be160eb66f231050765a1cef4c588e5b89913ad356a81973ec9e38135daeb9127e25440cf6f727dbda6c47a50cc9cf3e9e1972897b70d6083b2c14
+x-api-key: 1041006a7ccd6429320f0cb4ed5334f82936c0a8d9548d4778a53e13954197f4fc3556cf89b9fa8805da0458be928824e1d70130bd1d305161db7f16
 
 {
     "name": "shoe",

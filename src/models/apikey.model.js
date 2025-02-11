@@ -6,19 +6,19 @@ const COLLECTION_NAME = 'ApiKeys';
 const DOCUMENT_NAME = 'ApiKey'
 
 // Declare the Schema of the Mongo model
-var apiKeySchema = new Schema({
-    key:{
-        type:String,
-        required:true,
-        unique:true,
+const apiKeySchema = new Schema({
+    key: {
+        type: String,
+        required: true,
+        unique: true,
     },
-    status:{
+    status: {
         type: Boolean,
         default: true
     },
-    permissions:{
+    permissions: {
         type: [String],
-        required:true,
+        required: true,
         enum: ['0000', '1111', '2222']
     },
 }, {

@@ -12,7 +12,6 @@ class AccessController {
     }
 
     logout = async (req, res, next) => {
-        console.log(req.keyStore)
         new OK({
             message: "Logout Successfully",
             metadata: await AccessService.logout( req.keyStore ),
@@ -32,7 +31,11 @@ class AccessController {
     handleRefreshToken = async (req, res, next) => {
         new OK({
             message: "Get Token Successfully",
-            metadata: await AccessService.handleRefreshTokenUsed(req.body.refreshToken)
+            metadata: await AccessService.handleRefreshTokenUsed({
+                refreshToken: req.refreshToken,
+                user: req.user,
+                keyStore: req.keyStore
+            })
         }).send(res)
     }
 }

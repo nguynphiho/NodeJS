@@ -17,57 +17,35 @@ const RoleShop = {
 }
 
 class AccessService {
+    // Check token was used?
+    static handleRefreshTokenUsed = async ({ refreshToken, user, keyStore }) => {
+        const { userId, email } = user;
 
-    /*
-        Check token was used?
-    */
-    static handleRefreshTokenUsed = async (refreshToken) => {
-        // Check if the token was used?
-        const foundKeyToken = await KeyTokenService.findByRefreshTokenUsed(refreshToken)
-
-        // Yes
-        if (foundKeyToken) {
-            // Decode and identify the user
-            const { userId, email } = await verifyJWT(refreshToken, foundKeyToken.publicKey)
-            console.log({ userId, email })
+        if (keyStore.refreshTokensUsed.includes(refreshToken)) {
             // Delete the key token
             await KeyTokenService.deleteKeyById(userId)
             throw new ForbiddenError("Something went wrong, Please login again!")
         }
 
-        // No
-        const holderToken = await KeyTokenService.findByRefreshToken(refreshToken)
-        if (!holderToken) throw new AuthFailureError("Shop is not registered!")
+        if (keyStore.refreshToken !== refreshToken) throw new AuthFailureError("Shop is not registered!")
 
         // Verify token
-        const { userId, email } = await verifyJWT(refreshToken, holderToken.publicKey)
-        console.log("DEBUG handle refresh token", { userId, email })
-
         const foundShop = findByEmail(email)
         if (!foundShop) throw new AuthFailureError("Shop is not registered!")
 
         // Create new pair token
-        const tokens = await createTokenPair({ userId, email }, holderToken.publicKey, holderToken.privateKey)
+        const tokens = await createTokenPair({ userId, email }, keyStore.publicKey, keyStore.privateKey)
 
         // Update token
-        await holderToken.update({
-            $set: {
-                refreshToken: tokens.refreshToken
-            },
-            $addToSet: {
-                refreshTokensUsed: refreshToken // the token was used to get a new token.
-            }
-        })
+        keyStore.refreshToken = tokens.refreshToken;
+        keyStore.refreshTokensUsed.push(refreshToken);
+        await keyStore.save();
 
-        return {
-            user : { userId, email },
-            tokens
-        }
+        return { user, tokens }
     }
 
     static logout = async( keyStore ) => {
-        const delKey = await KeyTokenService.removeKeyById(keyStore._id);
-        return delKey;
+        return await KeyTokenService.removeKeyById(keyStore._id);
     }
 
     /**

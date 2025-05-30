@@ -7,6 +7,7 @@ const {
     findOne,
     findAllDraff,
     findAllPublished,
+    updateProductById,
     searchProductByUser,
     publishedProductByShop,
     unPublishedProductByShop,
@@ -23,9 +24,15 @@ class ProductService {
     }
 
     static async createProduct(type, payload) {
-        const productType = ProductService.productTypes[type]
-        if (!productType) throw new BadRequestError(`Invalid Product Type: ${type}`)
-        return new productType(payload).createProduct()
+        const productClass = ProductService.productTypes[type]
+        if (!productClass) throw new BadRequestError(`Invalid Product Type: ${type}`)
+        return new productClass(payload).createProduct()
+    }
+
+    static async updateProduct(type, productId, payload) {
+        const productClass = ProductService.productTypes[type]
+        if (!productClass) throw new BadRequestError(`Invalid Product Type: ${type}`)
+        return new productClass(payload).updateProduct(productId)
     }
 
     static async findAllDraffForShop({ product_shop, limit = 50, skip = 0 }) {
@@ -78,6 +85,11 @@ class Product {
     async createProduct() {
         return await product.create(this);
     }
+
+    static async updateProduct(productId, updateBody) {
+        return await updateProductById({ model: product, productId, updateBody })
+    }
+
 }
 
 //define subclass for different product type clothing
@@ -91,6 +103,16 @@ class Clothing extends Product {
 
         return newProduct;
     }
+
+    async updateProduct(productId) {
+        const objectParams = this
+        if (objectParams.product_attributes) {
+            await updateProductById({ model: clothing, productId, objectParams })
+        }
+        
+        const updateProduct = await super.updateProductById(productId, objectParams)
+        return updateProduct
+    }
 }
 
 class Electronic extends Product {
@@ -103,6 +125,16 @@ class Electronic extends Product {
 
         return newProduct;
 
+    }
+
+    async updateProduct(productId) {
+        const objectParams = this
+        if (objectParams.product_attributes) {
+            await updateProductById({ model: electronic, productId, objectParams })
+        }
+        
+        const updateProduct = await super.updateProductById(productId, objectParams)
+        return updateProduct
     }
 }
 

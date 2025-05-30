@@ -81,6 +81,10 @@ const findOne = async function({ productId, unSelect }){
     return await product.findById(productId).select(getUnSelectData(unSelect))
 }
 
+const updateProductById = async function ({ model, productId, updateBody, isNew = true}) {
+    return await model.findByIdAndUpdate(productId, updateBody, { new: isNew })
+}
+
 const queryProduct = async function({ query, limit, sort, skip, populate, selectPopulate, select = [] }) {
     return await product.find(query)
         .populate(populate, selectPopulate)
@@ -97,6 +101,7 @@ module.exports = {
     findOne,
     findAllDraff,
     findAllPublished,
+    updateProductById,
     searchProductByUser,
     publishedProductByShop,
     unPublishedProductByShop,

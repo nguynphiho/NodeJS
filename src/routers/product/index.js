@@ -15,6 +15,7 @@ router.get('/:productId', asyncHandler(productController.findProduct))
 router.use(authentication)
 
 router.post('/create', asyncHandler(productController.createProduct))
+router.patch('/update/:productId', asyncHandler(productController.updateProduct))
 router.get('/draff/all', asyncHandler(productController.getAllDraff))
 router.get('/published/all', asyncHandler(productController.getAllPublished))
 router.patch('/published/:id', asyncHandler(productController.publishedProduct))
